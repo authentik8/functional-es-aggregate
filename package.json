@@ -1,11 +1,11 @@
 {
   "name": "@authentik8/event-sourcing-kit",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "Kit of common utilities for building event-sourced applications",
   "main": "build/main/index.js",
   "typings": "build/main/index.d.ts",
   "module": "build/module/index.js",
-  "repository": "https://github.com/authentik8/@authentik8/event-sourcing-kit",
+  "repository": "https://github.com/authentik8/event-sourcing-kit",
   "license": "MIT",
   "keywords": [],
   "scripts": {
