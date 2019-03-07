@@ -1,62 +1,85 @@
 import uuid from 'uuid';
 
-import {
-  IAggregateDefinition,
-  ICommand,
-  IEvent,
-  IPublishable,
-  IRejectable,
-  IVersionedEntity
-} from '../interfaces';
+import { IRejectableCommand } from './Command';
+import { IEvent } from './Event';
 
-import VersionedEntity from './VersionedEntity';
+import { IPublishableEntity, IVersionedEntity, makeEntity } from './Entity';
 
-class Aggregate<T> {
-  private definition: IAggregateDefinition<T>;
-
-  constructor(definition: IAggregateDefinition<T>) {
-    this.definition = definition;
-
-    this.rehydrate = this.rehydrate.bind(this);
-    this.applyCommand = this.applyCommand.bind(this);
-    this.applyEvent = this.applyEvent.bind(this);
-  }
-
-  public rehydrate(
-    events: IEvent[],
-    snapshot?: IVersionedEntity<T>
-  ): IVersionedEntity<T> {
-    return events.reduce(this.applyEvent, snapshot || this.initialEntity);
-  }
-
-  public applyCommand(
-    entity: IVersionedEntity<T> & IPublishable,
-    command: ICommand & IRejectable
-  ): void {
-    const { name } = command;
-    const handler = this.definition.commands[name];
-    return handler && handler(entity, command);
-  }
-
-  private applyEvent(
-    entity: IVersionedEntity<T>,
-    event: IEvent
-  ): IVersionedEntity<T> {
-    const { name } = event;
-    const applyEvent = this.definition.eventHandlers[name];
-    return applyEvent ? entity.update(applyEvent(entity.state, event)) : entity;
-  }
-
-  private get initialEntity(): IVersionedEntity<T> {
-    const nextId = this.definition.getNextId || uuid.v4;
-
-    return new VersionedEntity({
-      id: nextId(),
-      name: this.definition.name,
-      state: this.definition.initialState,
-      version: 0
-    });
-  }
+interface IEventHandlerMap<T> {
+  [s: string]: (state: T, event: IEvent) => T;
 }
 
-export default Aggregate;
+interface ICommandHandlerMap<T> {
+  [s: string]: (
+    entity: IPublishableEntity<T>,
+    command: IRejectableCommand
+  ) => void;
+}
+
+export interface IAggregateDefinition<T> {
+  name: string;
+
+  initialState: T;
+
+  getNextId?: () => string;
+
+  eventHandlers: IEventHandlerMap<T>;
+
+  commands: ICommandHandlerMap<T>;
+}
+
+export interface IAggregate<T> {
+  readonly name: string;
+  rehydrate: (
+    events: IEvent[],
+    snapshot?: IVersionedEntity<T>
+  ) => IVersionedEntity<T>;
+  applyCommand: (
+    entity: IPublishableEntity<T>,
+    command: IRejectableCommand
+  ) => void;
+}
+
+export function createAggregate<T>(
+  definition: IAggregateDefinition<T>
+): IAggregate<T> {
+  const {
+    name: aggregateName,
+    commands,
+    eventHandlers,
+    getNextId = uuid.v4,
+    initialState
+  } = definition;
+
+  const applyEvent = (entity: IVersionedEntity<T>, event: IEvent) => {
+    const { name } = event;
+    const updatedState =
+      eventHandlers[name] && eventHandlers[name](entity.state, event);
+
+    return entity.update(updatedState);
+  };
+
+  const initialEntity = makeEntity({
+    id: getNextId(),
+    name: aggregateName,
+    state: initialState,
+    version: 0
+  });
+
+  const rehydrate = (events: IEvent[], snapshot?: IVersionedEntity<T>) =>
+    events.reduce(applyEvent, snapshot || initialEntity);
+
+  const applyCommand = (
+    entity: IPublishableEntity<T>,
+    command: IRejectableCommand
+  ) => {
+    const { name } = command;
+    return commands[name] && commands[name](entity, command);
+  };
+
+  return {
+    applyCommand,
+    rehydrate,
+    name: aggregateName
+  };
+}

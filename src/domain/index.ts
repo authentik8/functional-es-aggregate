@@ -1,7 +1,7 @@
-import Aggregate from './Aggregate';
-import VersionedEntity from './VersionedEntity';
+import { createAggregate } from './Aggregate';
+import { makeEntity } from './Entity';
 
 export default {
-  Aggregate,
-  VersionedEntity
+  createAggregate,
+  makeEntity
 };

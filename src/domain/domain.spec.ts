@@ -1,8 +1,8 @@
 import test from 'ava';
-import { IAggregateDefinition, IEvent } from '../interfaces';
 
-import Aggregate from './Aggregate';
-import VersionedEntity from './VersionedEntity';
+import { createAggregate, IAggregateDefinition } from './Aggregate';
+import { makeEntity } from './Entity';
+import { IEvent } from './Event';
 
 interface ICounter {
   count: number;
@@ -30,7 +30,7 @@ test.beforeEach((t: any) => {
   t.context.id = dummyId;
   t.context.entityName = 'Counter';
   t.context.counterStartState = { count: 1 };
-  t.context.aggregate = new Aggregate<ICounter>({
+  t.context.aggregate = createAggregate<ICounter>({
     ...counterDefinition,
     getNextId: () => dummyId
   });
@@ -39,7 +39,7 @@ test.beforeEach((t: any) => {
 test('VersionedEntity: constructor', (t: any) => {
   const { id, entityName: name, counterStartState: startState } = t.context;
 
-  const entity = new VersionedEntity<ICounter>({
+  const entity = makeEntity<ICounter>({
     id,
     name,
     state: startState,
@@ -55,7 +55,7 @@ test('VersionedEntity: constructor', (t: any) => {
 test('VersionedEntity: update', (t: any) => {
   const { id, entityName: name, counterStartState: startState } = t.context;
 
-  const entity = new VersionedEntity<ICounter>({
+  const entity = makeEntity<ICounter>({
     id,
     name,
     state: startState,
