@@ -1,8 +1,8 @@
 import test from 'ava';
 
-import { createAggregate, IAggregateDefinition } from './Aggregate';
+import { createAggregate } from './Aggregate';
 import { makeEntity } from './Entity';
-import { IEvent } from './Event';
+import { IAggregateDefinition, IEvent } from './interfaces';
 
 interface ICounter {
   count: number;

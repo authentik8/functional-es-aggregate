@@ -1,15 +1,4 @@
-export interface IVersionedEntity<T> {
-  readonly id: string;
-  readonly name: string;
-  readonly version: number;
-  readonly state: T;
-  update: (newState: T) => IVersionedEntity<T>;
-  [others: string]: any;
-}
-
-export interface IPublishableEntity<T> extends IVersionedEntity<T> {
-  publish: (name: string, data?: object) => void;
-}
+import { IVersionedEntity } from './interfaces';
 
 interface IParams<T> {
   id: string;

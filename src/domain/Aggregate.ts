@@ -1,44 +1,15 @@
 import uuid from 'uuid';
 
-import { IRejectableCommand } from './Command';
-import { IEvent } from './Event';
+import {
+  IAggregate,
+  IAggregateDefinition,
+  IEvent,
+  IPublishableEntity,
+  IRejectableCommand,
+  IVersionedEntity
+} from './interfaces';
 
-import { IPublishableEntity, IVersionedEntity, makeEntity } from './Entity';
-
-interface IEventHandlerMap<T> {
-  [s: string]: (state: T, event: IEvent) => T;
-}
-
-interface ICommandHandlerMap<T> {
-  [s: string]: (
-    entity: IPublishableEntity<T>,
-    command: IRejectableCommand
-  ) => void;
-}
-
-export interface IAggregateDefinition<T> {
-  name: string;
-
-  initialState: T;
-
-  getNextId?: () => string;
-
-  eventHandlers: IEventHandlerMap<T>;
-
-  commands: ICommandHandlerMap<T>;
-}
-
-export interface IAggregate<T> {
-  readonly name: string;
-  rehydrate: (
-    events: IEvent[],
-    snapshot?: IVersionedEntity<T>
-  ) => IVersionedEntity<T>;
-  applyCommand: (
-    entity: IPublishableEntity<T>,
-    command: IRejectableCommand
-  ) => void;
-}
+import { makeEntity } from './Entity';
 
 export function createAggregate<T>(
   definition: IAggregateDefinition<T>
