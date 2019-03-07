@@ -1,11 +1,11 @@
 {
-  "name": "@authentik8/event-sourcing-kit",
-  "version": "0.2.1",
-  "description": "Kit of common utilities for building event-sourced applications",
+  "name": "@authentik8/es-aggregate",
+  "version": "0.1.0",
+  "description": "Libary for building event-sourced aggregates",
   "main": "build/main/index.js",
   "typings": "build/main/index.d.ts",
   "module": "build/module/index.js",
-  "repository": "https://github.com/authentik8/event-sourcing-kit",
+  "repository": "https://github.com/authentik8/functional-es-aggregate",
   "license": "MIT",
   "keywords": [],
   "scripts": {
