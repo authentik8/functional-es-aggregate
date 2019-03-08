@@ -14,9 +14,6 @@ export interface ICommand {
     name: string;
   };
 
-  // Unique identifier for this command
-  id: string;
-
   // Name of the relevant aggregate's command
   name: string;
 
@@ -25,9 +22,6 @@ export interface ICommand {
 
   // Identifying data for the User initiating the command
   user?: object;
-
-  // Metadata about this command
-  metadata?: ICommandMetadata;
 }
 
 export interface IRejectableCommand extends ICommand {
@@ -52,6 +46,14 @@ export interface IEvent {
 
   // Data associated with this event
   payload: any;
+}
+
+export interface ICommandWithMetadata extends ICommand {
+  // Unique identifier for this command
+  id: string;
+
+  // Metadata about this command
+  metadata?: ICommandMetadata;
 }
 
 export interface IEventWithMetadata extends IEvent {
